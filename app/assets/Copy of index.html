@@ -3,7 +3,8 @@
 <head>
 <link rel="stylesheet" href="jquery.mobile-1.3.2.min.css">
 <link rel="stylesheet" href="css/custom.css">
-
+<link type="text/css" media="screen" rel="stylesheet" href="responsive-tables.css" />
+<script type="text/javascript" src="responsive-tables.js"></script>
 <script src="jquery-1.8.3.min.js"></script>
 <script src="jquery.mobile-1.3.2.min.js"></script>
 <script type="text/javascript">
@@ -27,23 +28,27 @@ $(document).ready(function(){
 		     // json (an  Array)
 		     console.log("Success;ngos:" + ngos);
 		     var ngoTable ="";
+		     //ngoTable = "<a class=\"ngoDetails\" data-role=\"button\" ngo>Details</a>";
+		     ngoTable = ngoTable + "<table class=\"responsive\" >" 
+		     		+ "<thead>" 
+		     		+ "<tr><th>S.NO</th><td>Name</th><th>Sectors</th><td>Details</th></tr>"
+		     		+ "</thead>"
+		     		+ "<tbody>";
 		     var ngoId = 1;
-		     ngoTable = "<ul data-role=\"listview\" >";
 		     for(ngoIndex in ngos){
 		     	ngo = ngos[ngoIndex];
 		     	console.log("ngo:" + ngo);
 		     	
-		     	ngoTable = ngoTable + "<li>" ;
-		     	ngoTable = ngoTable + "	<a href=\"#\" ngoId=\""+ ngo.id+"\" class=\"ngoDetails\" > ";
-		     	ngoTable = ngoTable + "		<div style=\"font-weight:bold\"> "+ ngo.name + "</div>" ;
-
-		     	ngoTable = ngoTable + "	</a>";
-		     	ngoTable = ngoTable + "		<div>" + ngo.sectors +"</div>";
-		     	ngoTable = ngoTable + "</li>" ;
+		        ngoTable = ngoTable + "<tr><th>" + ngoId + "</th><td>"+ ngo.name+ "</td>";
+		        ngoTable = ngoTable + "<td>" + ngo.sectors + "</td>";
+		        ngoTable = ngoTable + "<td><button class=\"ngoDetails\" ngoId=\""
+		        			+ ngo.id+"\">Details</button></td>";
+		        nogTable = ngoTable +  "</tr>";
 		        
 		        ngoId++;
 		     }
-		     ngoTable = ngoTable + "</ul>";
+		     ngoTable = ngoTable + "</tbody>";
+		     ngoTable = ngoTable + "</table>";
 		     console.log("ngoTable:" + ngoTable);
 		     $("#ngoTable").html(ngoTable);
 		     
@@ -74,21 +79,20 @@ $(document).ready(function(){
 	   success:function(vs){
 	     // json (an  Array)
 	     console.log("Success;ngos:" + vs);
-	     var vTable ="";
-	     vTable = "<ul data-role=\"listview\" >";
+	     var vTable ="<table><tr><td>S.NO</td><td>Name</td><td>Interests</td><td>Hours Per Week</td><td>Details</td></tr>";
+	     var vId = 1;
 	     for(vIndex in vs){
 	     	v = vs[vIndex];
-	     	console.log("volunteer:" + v);
+	     	console.log("ngo:" + ngo);
 	     	
-	     	vTable = vTable + "<li>" ;
-	     	vTable = vTable + "	<a href=\"#\" vId=\""+ v.id+"\" class=\"vDetails\" > ";
-	     	vTable = vTable + "		<div style=\"font-weight:bold\"> "+ v.name + "</div>" ;
-
-	     	vTable = vTable + "	</a>";
-	     	vTable = vTable + "		<div>Interests:" +v.interests +"</div><div>Hours Per Week:" + v.hours_week + "</div>";
-	     	vTable = vTable + "</li>" ;
+	        vTable = vTable + "<tr><td>" + vId + "</td><td>"+ v.name+ "</td>";
+	        vTable = vTable + "<td>" + v.interests + "</td>";
+	        vTable = vTable + "<td>" + v.hours_week + "</td>";
+	        vTable = vTable + "<td><button class=\"vDetails\"  vId=\"" + v.id+"\" >Details</button></td>";
+	        vTable = vTable +  "</tr>";
+	        vId++;
 	     }
-	     vTable = vTable + "</ul>";
+	     vTable = vTable + "</table>";
 	     console.log("vTable:" + vTable);
 	     $("#vTable").html(vTable);
 	     
@@ -179,37 +183,11 @@ function loadNgoDetails(ngoId){
 		   		$("#ngoName").html(ngo.name);
 		   		$("#ngoDescription").html(ngo.description);
 		   		$("#ngoSectors").html(ngo.sectors);
-		   		if(ngoContactPerson != ""){
-		   		 	$("#ngoContactPerson").attr("href", "tel:" + ngo.contact_person);
-		   			$("#ngoContactPerson").text(ngo.contact_person);
-		   		}
+		   		$("#ngoContactPerson").html(ngo.contact_person);
 		   		$("#ngoMobile").html(ngo.mobile);
-		   		if(ngo.email != ""){
-		   			$("#ngoEmail").attr("href", "mailto:" + ngo.email);
-		   			$("#ngoEmail").text(ngo.email);
-		   		}
-		   		if(ngo.website){
-		   			$("#ngoWebsite").attr("href", ngo.website);
-		   			$("#ngoWebsite").text(ngo.website);
-		   		}
+		   		$("#ngoEmail").html(ngo.email);
+		   		$("#ngoWebsite").html(ngo.website);
 		   		$("#ngoKeywords").html(ngo.ngoKeywords);
-		   		
-		   		//ngoContact
-		   		var ngoContactHref;
-		   		var ngoContactText;
-		   		
-		   		if(ngo.mobile != ""){
-		   			ngoContactText = "Call";
-		   			ngoContactHref = "tel:" + ngo.mobile;
-		   		}else if(ngo.email != ""){
-		   			ngoContactText = "Email";
-		   			ngoContactHref = "mailto:" + ngo.email;
-		   		}else{
-		   			ngoContactText = "No Contact";
-		   			ngoContactHref = "#";
-		   		}
-		   		$("#ngoContact").attr("href", ngoContactHref);
-		   		$("#ngoContact").text(ngoContactText);
 		   		
 				$.mobile.changePage("#ngoDetail", null, true, true);
 		   },
@@ -244,23 +222,6 @@ function loadVolunteerDetails(vId){
 	   		}
 	   		$("#vAddress").html(v.address);
 	   		
-	   		//volunteer contact
-   			var vContactHref;
-	   		var vContactText;
-	   		
-	   		if(v.phone != ""){
-	   			vContactText = "Call";
-	   			vContactHref = "tel:" + v.phone;
-	   		}else if(v.email != ""){
-	   			vContactText = "Email";
-	   			vContactHref = "mailto:" + v.email;
-	   		}else{
-	   			vContactText = "No Contact";
-	   			vContactHref = "#";
-	   		}
-	   		$("#vContact").attr("href", vContactHref);
-	   		$("#vContact").text(vContactText);
-	   		
 			$.mobile.changePage("#vDetail", null, true, true);
 	   },
 	   error:function(){
@@ -282,26 +243,22 @@ function loadNGOList(){
 	   success:function(ngos){
 	     // json (an  Array)
 	     console.log("Success;ngos:" + ngos);
-	     	
-     	 var ngoTable ="";
+	     var ngoTable ="";
+	     //ngoTable = "<a class=\"ngoDetails\" data-role=\"button\" ngo>Details</a>";
+	     ngoTable = ngoTable + "<table><tr><td>S.NO</td><td>Name</td><td>Sectors</td><td>Details</td></tr>";
 	     var ngoId = 1;
-	     ngoTable = "<ul data-role=\"listview\" >";
 	     for(ngoIndex in ngos){
 	     	ngo = ngos[ngoIndex];
 	     	console.log("ngo:" + ngo);
 	     	
-	     	ngoTable = ngoTable + "<li>" ;
-	     	ngoTable = ngoTable + "	<a href=\"#\" ngoId=\""+ ngo.id+"\" class=\"ngoDetails\" > ";
-	     	ngoTable = ngoTable + "		<div style=\"font-weight:bold\"> "+ ngo.name + "</div>" ;
-
-	     	ngoTable = ngoTable + "	</a>";
-	     	ngoTable = ngoTable + "		<div>" + ngo.sectors +"</div>";
-	     	ngoTable = ngoTable + "</li>" ;
-	        
+	        ngoTable = ngoTable + "<tr><td>" + ngo.id + "</td><td>"+ ngo.name+ "</td>";
+	        ngoTable = ngoTable + "<td>" + ngo.sectors + "</td>";
+	        ngoTable = ngoTable + "<td><button class=\"ngoDetails\" ngoId=\""
+	        			+ ngo.id+"\">Details</button></td>";
+	        nogTable = ngoTable +  "</tr>";
 	        ngoId++;
 	     }
-	     ngoTable = ngoTable + "</ul>";
-		     
+	     ngoTable = ngoTable + "</table>";
 	     console.log("ngoTable:" + ngoTable);
 	     $("#ngoTable").html(ngoTable);
 	     
@@ -329,10 +286,7 @@ function loadVolunteerList(){
 	   success:function(vs){
 	     // json (an  Array)
 	     console.log("Success;ngos:" + vs);
-	     
-	     
-	     /*
-	     var vTable ="<ul data-role=\"listview\" >";
+	     var vTable ="<table><tr><td>S.NO</td><td>Name</td><td>Interests</td><td>Hours Per Week</td><td>Details</td></tr>";
 	     var vId = 1;
 	     for(vIndex in vs){
 	     	v = vs[vIndex];
@@ -345,27 +299,7 @@ function loadVolunteerList(){
 	        vTable = vTable +  "</tr>";
 	        vId++;
 	     }
-	     vTable = vTable + "</u>";
-	     */
-	     
-	     
-	     var vTable ="";
-	     vTable = "<ul data-role=\"listview\" >";
-	     for(vIndex in vs){
-	     	v = vs[vIndex];
-	     	console.log("volunteer:" + v);
-	     	
-	     	vTable = vTable + "<li>" ;
-	     	vTable = vTable + "	<a href=\"#\" vId=\""+ v.id+"\" class=\"vDetails\" > ";
-	     	vTable = vTable + "		<div style=\"font-weight:bold\"> "+ v.name + "</div>" ;
-
-	     	vTable = vTable + "	</a>";
-	     	vTable = vTable + "		<div>Interests:" +v.interests +"</div><div>Hours Per Week:" + v.hours_week + "</div>";
-	     	vTable = vTable + "</li>" ;
-	     }
-	     vTable = vTable + "</ul>";
-		     
-		     
+	     vTable = vTable + "</table>";
 	     console.log("vTable:" + vTable);
 	     $("#vTable").html(vTable);
 	     
@@ -439,10 +373,10 @@ function loadVolunteerList(){
 				<font color="white" style="font-weight:none;">GO</font>
 			</a>
 	
+	<a href="#ngoForm" class="bbtnb" data-role="button" >Add yourself to the NGO List</a>	
 	<div id="vTable">
 	
 	</div>
-	<a href="#ngoForm" class="bbtnb" data-role="button" >Add yourself to the NGO List</a>	
   </div>
 
 </div> 
@@ -458,10 +392,10 @@ function loadVolunteerList(){
 	 	 <a id="ngoSearchBtn" class="bbtn" data-role="button" >
 				<font color="white" style="font-weight:none;">GO</font>
 			</a>
+	<a href="#volunteerFormpage" class="bbtnb" data-role="button" >Add yourself to the Volunteers List</a>
 	<div id="ngoTable">
 	  
 	</div>
-	<a href="#volunteerFormpage" class="bbtnb" data-role="button" >Add yourself to the Volunteers List</a>
 	</div>
 </div> 
 
@@ -477,15 +411,14 @@ function loadVolunteerList(){
   		<tr><td>Name</td><td><div id="ngoName"></div></td></tr>
 	   	<tr><td>Description</td><td><div id="ngoDescription"></div></td></tr>
   		<tr><td>Sectors</td><td><div id="ngoSectors"></div></td></tr>
-   		<tr><td>Contact Person</td><td><a href="" id="ngoContactPerson"></a></td></tr>
+   		<tr><td>Contact Person</td><td><div id="ngoContactPerson"></div></td></tr>
   		<tr><td>Address</td><td><div id="ngoAddress"></div></td></tr>
-  		<tr><td>Mobile</td><td><a id="ngoMobile"></a></td></tr>
-  		<tr><td>Email</td><td><a id="ngoEmail"></a></td></tr>
-  		<tr><td>Website</td><td><a id="ngoWebsite"></a></td></tr>
+  		<tr><td>Mobile</td><td><div id="ngoMobile"></div></td></tr>
+  		<tr><td>Email</td><td><div id="ngoEmail"></div></td></tr>
+  		<tr><td>Website</td><td><div id="ngoWebsite"></div></td></tr>
   		<tr><td>Keywords</td><td><div id="ngoKeywords"></div></td></tr>
     </table>
-    	
-    	<a href="#ngo" class="bbtnb" data-role="button" id="ngoContact" >Contact</a>
+    
     <h1>
   		<a style="font-size:16px;" id="ngoFBShare" href="https://www.facebook.com/sharer/sharer.php?u=example.org" target="_blank">Share on Facebook</a> 
   	</h1>
@@ -533,7 +466,6 @@ function loadVolunteerList(){
      	</tr>
      
      </table>
-     <a href="#ngo" class="bbtnb" data-role="button" id="vContact" >Contact</a>
   </div>
 </div> 
 
