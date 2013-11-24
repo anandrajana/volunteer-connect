@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" href="jquery.mobile-1.3.2.min.css">
+<link rel="stylesheet" href="css/custom.css">
+<script src="jquery-1.8.3.min.js"></script>
+<script src="jquery.mobile-1.3.2.min.js"></script>
+<script type="text/javascript">
+
+$(document).ready(function(){
+  console.log("document ready");
+  $( "#ngoSearchBtn" ).bind( "click", function(event, ui) {
+  	console.log("inside ngo search");
+	var searchVar = $("#ngoSearch").val();
+	if(searchVar == ""){
+		alert("Please enter What to search");
+		$("#ngoSearch").focus();
+		return;
+	}
+	console.log("searchVar:" + searchVar);
+	var  ngoSearchUrl = "http://toprecur.com/socialimpact/ngo_search.php?search="+ searchVar;
+		$.ajax({
+		   url: ngoSearchUrl,
+		   dataType: 'json', // N.B! JSONP   It is lower Case OK?
+		   success:function(ngos){
+		     // json (an  Array)
+		     console.log("Success;ngos:" + ngos);
+		     var ngoTable ="";
+		     //ngoTable = "<a class=\"ngoDetails\" data-role=\"button\" ngo>Details</a>";
+		     ngoTable = ngoTable + "<table><tr><td>S.NO</td><td>Name</td><td>Sectors</td><td>Details</td></tr>";
+		     var ngoId = 1;
+		     for(ngoIndex in ngos){
+		     	ngo = ngos[ngoIndex];
+		     	console.log("ngo:" + ngo);
+		     	
+		        ngoTable = ngoTable + "<tr><td>" + ngo.id + "</td><td>"+ ngo.name+ "</td>";
+		        ngoTable = ngoTable + "<td>" + ngo.sectors + "</td>";
+		        ngoTable = ngoTable + "<td><button class=\"ngoDetails\" ngoId=\""
+		        			+ ngo.id+"\">Details</button></td>";
+		        nogTable = ngoTable +  "</tr>";
+		        ngoId++;
+		     }
+		     ngoTable = ngoTable + "</table>";
+		     console.log("ngoTable:" + ngoTable);
+		     $("#ngoTable").html(ngoTable);
+		     
+		     $(".ngoDetails").bind( "click", function(event, ui) {
+		     			var ngoId1 = $(this).attr("ngoId");
+				   		console.log("ngoDetails clicked ;ngoId:" + ngoId1);
+				   		
+				   		loadNgoDetails(ngoId1);
+
+			  });
+			
+		 },
+		 error:function(){
+		     console.log("Error");
+		 },
+		});
+	});
+
+	//volunteer 
+	$( "#volunteerSearchBtn" ).bind( "click", function(event, ui) {
+  	console.log("inside volunteer search");
+	var searchVar = $("#volunteerSearch").val();
+	console.log("searchVar:" + searchVar);
+	var  vSearchUrl = "http://toprecur.com/socialimpact/volunteer_search.php?search="+ searchVar;
+	$.ajax({
+	   url: vSearchUrl,
+	   dataType: 'json', // N.B! JSONP   It is lower Case OK?
+	   success:function(vs){
+	     // json (an  Array)
+	     console.log("Success;ngos:" + vs);
+	     var vTable ="<table><tr><td>S.NO</td><td>Name</td><td>Interests</td><td>Hours Per Week</td><td>Details</td></tr>";
+	     var vId = 1;
+	     for(vIndex in vs){
+	     	v = vs[vIndex];
+	     	console.log("ngo:" + ngo);
+	     	
+	        vTable = vTable + "<tr><td>" + v.id + "</td><td>"+ v.name+ "</td>";
+	        vTable = vTable + "<td>" + v.interests + "</td>";
+	        vTable = vTable + "<td>" + v.hours_week + "</td>";
+	        vTable = vTable + "<td><button class=\"vDetails\"  vId=\"" + v.id+"\" >Details</button></td>";
+	        vTable = vTable +  "</tr>";
+	        vId++;
+	     }
+	     vTable = vTable + "</table>";
+	     console.log("vTable:" + vTable);
+	     $("#vTable").html(vTable);
+	     
+	     $(".vDetails").bind( "click", function(event, ui) {
+	     			var vId1 = $(this).attr("vId");
+			   		console.log("vDetails clicked ;vId:" + vId1);
+			   		
+			   		loadVolunteerDetails(vId1);
+
+		  });
+	     
+	 },
+	 error:function(){
+	     console.log("Error");
+	 },
+	});
+
+   });
+   
+   $("#ngoDetails").bind( "click", function(event, ui) {
+   		console.log("ngoDetails clicked");
+   });
+
+});
+
+function loadNgoDetails(ngoId){
+		//$("#ngoDetail").show();
+		
+		var ngoUrl = "http://toprecur.com/socialimpact/ngo.php?id=" + ngoId;
+		$.ajax({
+		   url: ngoUrl,
+		   dataType: 'json', // N.B! JSONP   It is lower Case OK?
+		   success:function(ngo){
+		   		console.log("ngo:" + ngo);
+ 
+ 				if(ngo.name != "" && ngoId != ""){
+ 					var ngoFBShareUrl = "https://www.facebook.com/sharer/sharer.php?u=toprecur.com/socialimpact/ngoviewfb.php?id="+ngoId;
+ 					var ngoFBShareText = "Share on Facebook";
+ 					$("#ngoFBShare").attr("href", ngoFBShareUrl);
+ 					$("#ngoFBShare").text(ngoFBShareText);
+ 				}
+		   		$("#ngoName").html(ngo.name);
+		   		$("#ngoDescription").html(ngo.description);
+		   		$("#ngoSectors").html(ngo.sectors);
+		   		$("#ngoContactPerson").html(ngo.contact_person);
+		   		$("#ngoMobile").html(ngo.mobile);
+		   		$("#ngoEmail").html(ngo.email);
+		   		$("#ngoWebsite").html(ngo.website);
+		   		$("#ngoKeywords").html(ngo.ngoKeywords);
+		   		
+				$.mobile.changePage("#ngoDetail", null, true, true);
+		   },
+		   error:function(){
+	     	console.log("Error");
+	 	  }
+	 	 });
+
+}
+function loadVolunteerDetails(vId){
+	console.log("load volunteerDetails vId:" + vId);
+	
+	var vUrl = "http://toprecur.com/socialimpact/volunteer.php?id=" + vId;
+	$.ajax({
+	   url: vUrl,
+	   dataType: 'json', // N.B! JSONP   It is lower Case OK?
+	   success:function(v){
+	   		console.log("volunteer:" + v);
+	
+			$("#vId").html(v.id);
+	   		$("#vName").html(v.name);
+	   		$("#vInterests").html(v.interests);
+	   		$("#vHoursWeek").html(v.hours_week);
+	   		$("#vDescription").html(v.description);
+	   		if(v.email != ""){
+	   			$("#vEmail").attr("href","mailto:" + v.email);
+	   			$("#vEmail").text(v.email);
+	   		}
+	   		if(v.phone != ""){
+	   			$("#vPhone").attr("href", "tel:" + v.phone);
+	   			$("#vPhone").text(v.phone);
+	   		}
+	   		$("#vAddress").html(v.address);
+	   		
+			$.mobile.changePage("#vDetail", null, true, true);
+	   },
+	   error:function(){
+     	console.log("Error");
+ 	  }
+ 	 });
+	
+}
+</script>
+</head>
+<body>
+
+<div data-role="page" id="main">
+	  <div data-role="header">
+	  </div>
+	  
+	  <div data-role="content">
+	      <center>
+	      
+		      </br>
+		      </br>
+		      
+		      <img src="images/logo.png"/>
+		      
+		      </br>
+		      </br>
+		      </br>
+		      </br>
+		      
+	      	<a href="#ngo" class="bbtn" data-role="button" >
+	      		<font color="white" style="font-weight:none;">I am a Volunteer</font>
+	      	</a>
+	      	<br>
+	      	
+			<div class="or">or</div>
+			
+			<br>
+			 
+			<a href="#volunteer" class="bbtn" data-role="button" >
+				<font color="white" style="font-weight:none;">I am NGO</font>
+			</a>
+			
+		   </center>
+	  </div>
+</div> 
+
+<div data-role="page" id="volunteer">
+  <div data-role="header">
+  
+  	<a href="#main" class="bbtnb" data-role="button" ><img src="images/leftarrow.png"/></a> 
+  	<h1>All Volunteers</h1>
+
+ </div>
+  
+  <div data-role="content">
+
+	 <div ><input type="text" name="search" id="volunteerSearch" placeholder="Search Volunteer" ></input></div>
+	 
+	 <a id="volunteerSearchBtn" class="bbtn" data-role="button" >
+				<font color="white" style="font-weight:none;">GO</font>
+			</a>
+	
+	
+	<div id="vTable">
+	
+	</div>
+  </div>
+
+</div> 
+
+<div data-role="page" id="ngo">
+  <div data-role="header">
+  	<a href="#main" class="bbtnb" data-role="button" ><img src="images/leftarrow.png"/></a> 
+  	<h1>All NGOs</h1>
+  </div>
+
+  <div data-role="content">
+	 <div ><input type="text" name="search" id="ngoSearch" placeholder="Search NGO" ></input></div>
+	 	 <a id="ngoSearchBtn" class="bbtn" data-role="button" >
+				<font color="white" style="font-weight:none;">GO</font>
+			</a>
+	<div id="ngoTable">
+	  
+	</div>
+  </div>
+</div> 
+
+<div data-role="page" id="ngoDetail">
+  <div data-role="header">
+  	<a href="#ngo" class="bbtnb" data-role="button" ><img src="images/leftarrow.png"/></a>
+    <h1>NGO Information</h1>
+  </div>
+
+  <div data-role="content">
+
+  	<table>
+  		<tr><td>Name</td><td><div id="ngoName"></div></td></tr>
+	   	<tr><td>Description</td><td><div id="ngoDescription"></div></td></tr>
+  		<tr><td>Sectors</td><td><div id="ngoSectors"></div></td></tr>
+   		<tr><td>Contact Person</td><td><div id="ngoContactPerson"></div></td></tr>
+  		<tr><td>Address</td><td><div id="ngoAddress"></div></td></tr>
+  		<tr><td>Mobile</td><td><div id="ngoMobile"></div></td></tr>
+  		<tr><td>Email</td><td><div id="ngoEmail"></div></td></tr>
+  		<tr><td>Website</td><td><div id="ngoWebsite"></div></td></tr>
+  		<tr><td>Keywords</td><td><div id="ngoKeywords"></div></td></tr>
+    </table>
+    
+    <h1>
+  		<a style="font-size:16px;" id="ngoFBShare" href="https://www.facebook.com/sharer/sharer.php?u=example.org" target="_blank">Share on Facebook</a> 
+  	</h1>
+  </div>
+</div> 
+	   		
+<div data-role="page" id="vDetail">
+  <div data-role="header">
+
+   	<a href="#volunteer" class="bbtnb" data-role="button" ><img src="images/leftarrow.png"/></a>
+    <h1>Volunteer Information</h1>
+
+  </div>
+
+  <div data-role="content">
+  	 <table >
+	 	<tr>
+     		<td>Name:</td>
+     		<td><div id="vName"></div></td>
+     	</tr>
+     	<tr>
+     		<td>Interests</td>
+     		<td><div id="vInterests"></div></td>
+     	</tr>
+     	<tr>
+     		<td>Hours Per Week</td>
+     		<td><div id="vHoursWeek"></div></td>
+     	</tr>
+     	<tr>
+     		<td>Description</td>
+     		<td><div id="vDescription"></div></td>
+     	</tr>
+     	<tr>
+     		<td>Email</td>
+     		<td><a href="" id="vEmail"></a></td>
+     	</tr>
+     	<tr>
+     		<td>Phone</td>
+     		<!-- <td><div id="vPhone"></div></td> -->
+     		<td><a href="tel:2125551212" id ="vPhone" ></a></td>
+     	</tr>
+     	<tr>
+     		<td>Address</td>
+     		<td> <div id="vAddress"></div></td>
+     	</tr>
+     
+     </table>
+  </div>
+</div> 
+
+</body>
+</html>
